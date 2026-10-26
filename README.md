@@ -1,19 +1,6 @@
 # SQL Server Standard Edition Upgrade — v0.1.0-preview1
 
-## Open the menu — start here
-
-On the SQL server itself, open **64-bit Windows PowerShell as administrator** and paste this command, including after a restart:
-
-```powershell
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned -Force
-& 'C:\Tools\SqlServerStandardEditionUpgrade-v0.1.0-preview1\Start-SqlServerUpgrade.ps1'
-```
-
-If you used a custom installation directory or `-WorkRoot`, use those same paths again. If the package is not installed yet, follow **Install and open the menu** below.
-
-Local SQL Server 2017 Standard to **2022 or 2025 Standard**, using an interactive Setup Wizard with a pinned CU-branch update. This separate preview does not change the Express package. **Not yet qualified for production: licensed Standard media and visible Wizard qualification are still required. Developer engine rehearsals are documented separately.**
-
-## Install and open the menu
+## 0. Install the package
 
 Sign in to the SQL server itself with a Windows account that is a local administrator and SQL sysadmin. Open **64-bit Windows PowerShell as administrator** and run:
 
@@ -30,6 +17,19 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned -Force
 
 The bootstrap downloads the exact versioned release ZIP and checks its pinned SHA-256 before extraction. Installation opens the local menu; it does not upgrade SQL. Repeating installation reuses identical files and preserves different existing files. For an offline transfer, extract the verified release ZIP and run `Install.ps1` from that directory. Use `-NoLaunch` to install without opening the menu.
 
+Local SQL Server 2017 Standard to **2022 or 2025 Standard**, using an interactive Setup Wizard with a pinned CU-branch update. This separate preview does not change the Express package. **Not yet qualified for production: licensed Standard media and visible Wizard qualification are still required. Developer engine rehearsals are documented separately.**
+
+## 1. Open the main menu
+
+After installation, open **64-bit Windows PowerShell as administrator** on the SQL server and run:
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned -Force
+& 'C:\Tools\SqlServerStandardEditionUpgrade-v0.1.0-preview1\Start-SqlServerUpgrade.ps1'
+```
+
+Use this same command whenever you reopen the program, including after restarting Windows. If you installed to a custom directory, adjust the script path. If you selected a custom `-WorkRoot`, keep using that same runtime directory.
+
 The script discovers local running SQL 2017 Standard instances. With more than one, choose the intended instance. There is no Hyper-V VM name or remote SQL server prompt. For a separate campaign/instance use a separate runtime:
 
 ```powershell
@@ -38,7 +38,7 @@ The script discovers local running SQL 2017 Standard instances. With more than o
 
 Keep that same `-WorkRoot` on every subsequent invocation. Do not use an Express runtime directory.
 
-## Before downtime
+## 2. Prepare before downtime
 
 1. **Menu 1 — Prepare.** Choose 2022 or 2025 and supply a local/UNC path to the licensed target Standard ISO. Confirm entitlement and media edition. The ISO may be RTM: the tool copies it locally, obtains the newest CU-branch build from Microsoft's catalog, and asks you to approve the update after reviewing its known issues and application support. If automatic URL resolution fails, supply the exact Microsoft package URL. Internet access is needed during preparation.
 2. Preparation validates Microsoft signatures, records SHA-256 hashes, and pins the update/build. The media and update remain separate directories; Setup uses `/UpdateEnabled=True /UpdateSource=...` to integrate the update. The tool does not silently fall back to RTM or choose a different update on upgrade day. Read the generated `UPGRADE-PLAN.txt` and `ROLLBACK-PLAN.txt` in the runtime directory.
@@ -48,7 +48,7 @@ Keep that same `-WorkRoot` on every subsequent invocation. Do not use an Express
 
 The copied ISO can contain a licensed target PID. The runtime is restricted to administrators/SYSTEM; protect off-server copies too. The tool never extracts the old SQL 2017 key. Software Assurance entitlement does not make a 2017 key a target-version key. Obtain the licensed target media through your licensing channel; if Setup requests a target key, enter it there, never in a script or log.
 
-## Upgrade window
+## 3. Upgrade window
 
 1. Stop application writers and coordinate scheduled SQL Agent jobs. Capture the agreed recovery point and final **menu 2** backups; copy them off-server.
 2. Resolve any pending Windows restart, reopen the same menu/runtime, then choose **3 — Final readiness**. Read `FINAL-READINESS.txt`: backup time/age/paths, update/build and failure reason. The check validates media, backup availability, OS, disk space, source identity and Agent metadata. Capacity thresholds are minimum guards, not a workload-specific sizing guarantee. Technical readiness is not application-owner approval.
@@ -58,7 +58,7 @@ The copied ISO can contain a licensed target PID. The runtime is restricted to a
 
 If Setup fails or is cancelled, preserve logs and inspect actual engine state before retrying. The tool does not automatically repair failed Setup or roll back a server. Do not erase campaign files to bypass a failed check. Preparation cannot replace media after Wizard launch; use a new campaign only after establishing a known source baseline.
 
-## Rollback
+## 4. Rollback
 
 Read the generated instance-specific `ROLLBACK-PLAN.txt`. Keep writers stopped, agree the data-loss point, preserve logs and later writes externally, and use the recorded provider procedure to restore the entire pre-upgrade server. There is no in-place engine downgrade; target-version database backups cannot be restored to SQL 2017.
 
