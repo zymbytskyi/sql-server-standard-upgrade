@@ -1,5 +1,16 @@
 # SQL Server Standard Edition Upgrade — v0.1.0-preview1
 
+## Open the menu — start here
+
+On the SQL server itself, open **64-bit Windows PowerShell as administrator** and paste this command, including after a restart:
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned -Force
+& 'C:\Tools\SqlServerStandardEditionUpgrade-v0.1.0-preview1\Start-SqlServerUpgrade.ps1'
+```
+
+If you used a custom installation directory or `-WorkRoot`, use those same paths again. If the package is not installed yet, follow **Install and open the menu** below.
+
 Local SQL Server 2017 Standard to **2022 or 2025 Standard**, using an interactive Setup Wizard with a pinned CU-branch update. This separate preview does not change the Express package. **Not yet qualified for production: licensed Standard media and visible Wizard qualification are still required. Developer engine rehearsals are documented separately.**
 
 ## Install and open the menu
@@ -18,13 +29,6 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned -Force
 ```
 
 The bootstrap downloads the exact versioned release ZIP and checks its pinned SHA-256 before extraction. Installation opens the local menu; it does not upgrade SQL. Repeating installation reuses identical files and preserves different existing files. For an offline transfer, extract the verified release ZIP and run `Install.ps1` from that directory. Use `-NoLaunch` to install without opening the menu.
-
-Reopen the installed menu, including after restarting Windows:
-
-```powershell
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned -Force
-& 'C:\Tools\SqlServerStandardEditionUpgrade-v0.1.0-preview1\Start-SqlServerUpgrade.ps1'
-```
 
 The script discovers local running SQL 2017 Standard instances. With more than one, choose the intended instance. There is no Hyper-V VM name or remote SQL server prompt. For a separate campaign/instance use a separate runtime:
 
