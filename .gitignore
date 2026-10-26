@@ -1,0 +1,17 @@
+*.iso
+*.exe
+*.bak
+*.vhdx
+*.avhdx
+*.zip
+*.credential.xml
+*.securestring.xml
+plan.json
+backups*.json
+recovery.json
+update.json
+agent-step-review.json
+Media/
+Updates/
+BackupSets/
+runtime/
